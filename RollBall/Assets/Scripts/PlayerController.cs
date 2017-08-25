@@ -14,17 +14,15 @@ public class PlayerController : MonoBehaviour
     public Text winText;
     public Text noticeText;
     public Button quitButton;
-    public Rigidbody pickup1;
-    public Rigidbody pickup2;
-    public Rigidbody pickup3;
-    public Rigidbody pickup4;
-    public Rigidbody pickup5;
-    public Rigidbody pickup6;
-    public Rigidbody pickup7;
-    public Rigidbody pickup8;
+    public Button nextButton;
+    public Transform PickUpPrefab;
+    public int countofbricks;
+    public Text levelText;
+    public int maxlevels;
 
     private Rigidbody rb;
     private int count;
+    private int level = 0;
 
     bool win = false;
 
@@ -33,26 +31,35 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         count = 0;
         SetCountText();
-        winText.text = "";
         quitButton.gameObject.SetActive(false);
-        pickup1.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
-        pickup2.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
-        pickup3.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
-        pickup4.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
-        pickup5.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
-        pickup6.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
-        pickup7.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
-        pickup8.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        nextButton.gameObject.SetActive(false);
+        winText.gameObject.SetActive(false);
+        levelText.text = "Level: 0";
+        for (int t = 0; t < countofbricks; t++) Instantiate(PickUpPrefab, new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9), Quaternion.identity);
     }
 
     int RandomNum()
     {
         byte[] randomBytes = new byte[4];
-        RNGCryptoServiceProvider rngCrypto =
-        new RNGCryptoServiceProvider();
+        RNGCryptoServiceProvider rngCrypto = new RNGCryptoServiceProvider();
         rngCrypto.GetBytes(randomBytes);
         int rngNum = BitConverter.ToInt32(randomBytes, 0);//此为随机数
         return rngNum;
+    }
+
+    void NextLevel()
+    {
+        quitButton.gameObject.SetActive(false);
+        nextButton.gameObject.SetActive(false);
+        winText.gameObject.SetActive(false);
+        noticeText.gameObject.SetActive(false);
+        countText.gameObject.SetActive(true);
+        levelText.gameObject.SetActive(true);
+        win = false;
+        count = 0;
+        level++;
+        countofbricks += (level * countofbricks);
+        for (int t = 0; t < countofbricks; t++) Instantiate(PickUpPrefab, new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9), Quaternion.identity);
     }
 
     void FixedUpdate()
@@ -78,21 +85,36 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("Pick Up"))
         {
             other.gameObject.SetActive(false);
-            count = count + 1;
+            count++;
             SetCountText();
         }
     }
 
     void SetCountText()
     {
-        countText.text = "Collected: " + count.ToString();
-        if (count >= 8)
+        countText.text = "Collected: " + count.ToString() + " of " + countofbricks.ToString();
+        if (count >= countofbricks)
         {
-            winText.text = "You Win!";
+            winText.gameObject.SetActive(true);
+            winText.text = "You won level " + level.ToString() + "!";
             noticeText.text = "A great job.";
+            levelText.text = "Level: " + (level + 1).ToString();
             win = true;
             quitButton.gameObject.SetActive(true);
             countText.gameObject.SetActive(false);
+            levelText.gameObject.SetActive(false);
+            nextButton.gameObject.SetActive(true);
+            if (level >= maxlevels) AllWin();
         }
+    }
+
+    void AllWin()
+    {
+        winText.gameObject.SetActive(true);
+        winText.text = ("You passed all the levels!");
+        noticeText.text = "Congratulations!";
+        win = true;
+        quitButton.gameObject.SetActive(true);
+        nextButton.gameObject.SetActive(false);
     }
 }
