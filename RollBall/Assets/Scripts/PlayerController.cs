@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Security.Cryptography;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,6 +14,14 @@ public class PlayerController : MonoBehaviour
     public Text winText;
     public Text noticeText;
     public Button quitButton;
+    public Rigidbody pickup1;
+    public Rigidbody pickup2;
+    public Rigidbody pickup3;
+    public Rigidbody pickup4;
+    public Rigidbody pickup5;
+    public Rigidbody pickup6;
+    public Rigidbody pickup7;
+    public Rigidbody pickup8;
 
     private Rigidbody rb;
     private int count;
@@ -25,6 +35,24 @@ public class PlayerController : MonoBehaviour
         SetCountText();
         winText.text = "";
         quitButton.gameObject.SetActive(false);
+        pickup1.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        pickup2.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        pickup3.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        pickup4.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        pickup5.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        pickup6.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        pickup7.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+        pickup8.position = new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9);
+    }
+
+    int RandomNum()
+    {
+        byte[] randomBytes = new byte[4];
+        RNGCryptoServiceProvider rngCrypto =
+        new RNGCryptoServiceProvider();
+        rngCrypto.GetBytes(randomBytes);
+        int rngNum = BitConverter.ToInt32(randomBytes, 0);//此为随机数
+        return rngNum;
     }
 
     void FixedUpdate()
@@ -60,7 +88,6 @@ public class PlayerController : MonoBehaviour
         countText.text = "Collected: " + count.ToString();
         if (count >= 8)
         {
-            
             winText.text = "You Win!";
             noticeText.text = "A great job.";
             win = true;

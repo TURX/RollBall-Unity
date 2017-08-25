@@ -1537,6 +1537,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a04f2471326562c4285d8b88601ff2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!54 &1661850095 stripped
+Rigidbody:
+  m_PrefabParentObject: {fileID: 54897172457502926, guid: cd0284609a74164489295542ea5a82fb,
+    type: 2}
+  m_PrefabInternal: {fileID: 1130171180}
 --- !u!1 &1667178227
 GameObject:
   m_ObjectHideFlags: 0
@@ -1874,6 +1879,7 @@ MonoBehaviour:
   winText: {fileID: 433809773}
   noticeText: {fileID: 839346556}
   quitButton: {fileID: 1378254974}
+  pickup1: {fileID: 1661850095}
 --- !u!114 &2040019591
 MonoBehaviour:
   m_ObjectHideFlags: 0
