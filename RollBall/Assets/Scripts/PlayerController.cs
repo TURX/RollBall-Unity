@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
 
     public float speed;
+    public float speedtouch;
     public Text countText;
     public Text winText;
     public Text noticeText;
@@ -28,11 +29,20 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        #region Keyboard
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
-
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
         if (win == false) rb.AddForce(movement * speed);
+        #endregion
+        #region Touchscreen
+        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
+        {
+            Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
+            Vector3 movementouch = new Vector3(-touchDeltaPosition.x, 0.0f, -touchDeltaPosition.y);
+            rb.AddForce(movementouch * speedtouch);            
+        }
+        #endregion
     }
 
     void OnTriggerEnter(Collider other)
