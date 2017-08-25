@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
         {
             Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
             Vector3 movementouch = new Vector3(-touchDeltaPosition.x, 0.0f, -touchDeltaPosition.y);
-            rb.AddForce(movementouch * speedtouch);            
+            if (win == false) rb.AddForce(movementouch * speedtouch);
         }
         #endregion
     }
@@ -60,10 +60,12 @@ public class PlayerController : MonoBehaviour
         countText.text = "Collected: " + count.ToString();
         if (count >= 8)
         {
+            
             winText.text = "You Win!";
             noticeText.text = "A great job.";
             win = true;
             quitButton.gameObject.SetActive(true);
+            countText.gameObject.SetActive(false);
         }
     }
 }
