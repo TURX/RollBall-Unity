@@ -54,7 +54,7 @@ PlayerSettings:
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 0
   m_MTRendering: 1
-  m_MobileMTRendering: 1
+  m_MobileMTRendering: 0
   m_StackTraceTypes: 010000000100000001000000010000000100000001000000
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: 2
@@ -149,7 +149,7 @@ PlayerSettings:
     Android: com.crystalstudio.rollball
   buildNumber: {}
   AndroidBundleVersionCode: 1
-  AndroidMinSdkVersion: 17
+  AndroidMinSdkVersion: 21
   AndroidTargetSdkVersion: 23
   AndroidPreferredInstallLocation: 1
   aotOptions: 

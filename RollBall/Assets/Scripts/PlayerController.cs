@@ -8,35 +8,48 @@ using System;
 public class PlayerController : MonoBehaviour
 {
 
-    public float speed;
-    public float speedtouch;
+    public float key_speed;
+    public float touch_speed;
+    public int countofbricks;
+    public int maxlevels;
     public Text countText;
     public Text winText;
     public Text noticeText;
-    public Button quitButton;
-    public Button nextButton;
-    public Transform PickUpPrefab;
-    public int countofbricks;
     public Text levelText;
-    public int maxlevels;
+    public Transform PickUpPrefab;
 
     private Rigidbody rb;
     private int count;
     private int level = 0;
 
     bool win = false;
+    bool allwin = false;
+
+    void OnGUI()
+    {
+        if (win)
+        {
+            if (GUI.Button(new Rect(Screen.width / 2 - 50, Screen.height / 2 - 15, 100, 30), "Quit Game"))
+            {
+                Application.Quit();
+            }
+            if (!allwin && GUI.Button(new Rect(Screen.width / 2 - 50, Screen.height / 2 + 30, 100, 30), "Next Level"))
+            {
+                NextLevel();
+            }
+        }
+    }
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         count = 0;
         SetCountText();
-        quitButton.gameObject.SetActive(false);
-        nextButton.gameObject.SetActive(false);
         winText.gameObject.SetActive(false);
         levelText.text = "Level: 0";
         for (int t = 0; t < countofbricks; t++) Instantiate(PickUpPrefab, new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9), Quaternion.identity);
     }
+
 
     int RandomNum()
     {
@@ -47,10 +60,10 @@ public class PlayerController : MonoBehaviour
         return rngNum;
     }
 
+
+
     void NextLevel()
     {
-        quitButton.gameObject.SetActive(false);
-        nextButton.gameObject.SetActive(false);
         winText.gameObject.SetActive(false);
         noticeText.gameObject.SetActive(false);
         countText.gameObject.SetActive(true);
@@ -68,14 +81,14 @@ public class PlayerController : MonoBehaviour
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
-        if (win == false) rb.AddForce(movement * speed);
+        if (win == false) rb.AddForce(movement * key_speed);
         #endregion
         #region Touchscreen
         if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Moved)
         {
             Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
             Vector3 movementouch = new Vector3(-touchDeltaPosition.x, 0.0f, -touchDeltaPosition.y);
-            if (win == false) rb.AddForce(movementouch * speedtouch);
+            if (win == false) rb.AddForce(movementouch * touch_speed);
         }
         #endregion
     }
@@ -100,10 +113,8 @@ public class PlayerController : MonoBehaviour
             noticeText.text = "A great job.";
             levelText.text = "Level: " + (level + 1).ToString();
             win = true;
-            quitButton.gameObject.SetActive(true);
             countText.gameObject.SetActive(false);
             levelText.gameObject.SetActive(false);
-            nextButton.gameObject.SetActive(true);
             if (level >= maxlevels) AllWin();
         }
     }
@@ -114,7 +125,6 @@ public class PlayerController : MonoBehaviour
         winText.text = ("You passed all the levels!");
         noticeText.text = "Congratulations!";
         win = true;
-        quitButton.gameObject.SetActive(true);
-        nextButton.gameObject.SetActive(false);
+        allwin = true;
     }
 }
