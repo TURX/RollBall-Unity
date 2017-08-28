@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public Text noticeText;
     public Text levelText;
     public Text timeText;
+    public Text dieCountText;
     public Transform PickUpPrefab;
     public GameObject Walls;
 
@@ -24,6 +25,7 @@ public class PlayerController : MonoBehaviour
     private int count;
     private int level = 0;
     private int countofbricks;
+    private int dietime = 0;
 
     bool win = false;
     bool allwin = false;
@@ -83,7 +85,7 @@ public class PlayerController : MonoBehaviour
         }
         #endregion
         #region TimeOut
-        timeText.text = "Countdown: " + time.ToString() + "s.";
+        timeText.text = "Countdown: " + time.ToString() + "s";
         if (time <= 0)
         {
             timer.Stop();
@@ -115,7 +117,7 @@ public class PlayerController : MonoBehaviour
         level++;
         countofbricks += (level * countofbricks);
         for (int t = 0; t < countofbricks; t++) Instantiate(PickUpPrefab, new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9), Quaternion.identity);
-        org_time *= level + 1;
+        org_time = Convert.ToInt32(countofbricks * (maxlevels - level + 1) / 3);
         time = org_time;
         now_time = time;
         timer.Start();
@@ -123,6 +125,9 @@ public class PlayerController : MonoBehaviour
 
     void ReTry()
     {
+        dietime++;
+        dieCountText.gameObject.SetActive(true);
+        if(dietime==1) dieCountText.text = "You died for 1 time"; else dieCountText.text = "You died for " + dietime.ToString() + " times";
         fail = false;
         win = false;
         allwin = false;
@@ -130,7 +135,6 @@ public class PlayerController : MonoBehaviour
         winText.color = Color.yellow;
         rb.MovePosition(new Vector3(0, 0, 0));
         rb = GetComponent<Rigidbody>();
-        levelText.gameObject.SetActive(true);
         noticeText.gameObject.SetActive(false);
         winText.gameObject.SetActive(false);
         time = now_time;
@@ -203,7 +207,6 @@ public class PlayerController : MonoBehaviour
         fail = true;
         winText.color = Color.red;
         noticeText.color = Color.red;
-        levelText.gameObject.SetActive(false);
         winText.gameObject.SetActive(true);
         noticeText.gameObject.SetActive(true);
         winText.text = "You died at level " + level.ToString() + ".";
