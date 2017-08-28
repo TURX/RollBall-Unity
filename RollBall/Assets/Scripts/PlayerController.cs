@@ -10,20 +10,29 @@ public class PlayerController : MonoBehaviour
 
     public float key_speed;
     public float touch_speed;
-    public int countofbricks;
+    public int orgCountofbricks;
     public int maxlevels;
     public Text countText;
     public Text winText;
     public Text noticeText;
     public Text levelText;
+    public Text timeText;
     public Transform PickUpPrefab;
+    public GameObject Walls;
 
     private Rigidbody rb;
     private int count;
     private int level = 0;
+    private int countofbricks;
 
     bool win = false;
     bool allwin = false;
+    bool fail = false;
+
+    long time;
+    long org_time;
+    long now_time;
+    private System.Timers.Timer timer = new System.Timers.Timer(1000);
 
     void OnGUI()
     {
@@ -38,32 +47,65 @@ public class PlayerController : MonoBehaviour
                 NextLevel();
             }
         }
+        if (fail)
+        {
+            if (GUI.Button(new Rect(Screen.width / 2 - 50, Screen.height / 2 + 30, 100, 30), "Retry this level"))
+            {
+                ReTry();
+            }
+        }
     }
 
     void Start()
     {
+        countofbricks = orgCountofbricks;
+        timeText.color = Color.green;
         rb = GetComponent<Rigidbody>();
         count = 0;
         SetCountText();
         winText.gameObject.SetActive(false);
         levelText.text = "Level: 0";
         for (int t = 0; t < countofbricks; t++) Instantiate(PickUpPrefab, new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9), Quaternion.identity);
+        time = 30;
+        now_time = time;
+        timer.Elapsed += new System.Timers.ElapsedEventHandler(CountDown);
+        timer.Start();
+        org_time = countofbricks * 2;
     }
 
+    void Update()
+    {
+        #region FellIntoVoid
+        if (rb.position.y < -20)
+        {
+            timer.Stop();
+            Die("You fell into void.");
+        }
+        #endregion
+        #region TimeOut
+        timeText.text = "Countdown: " + time.ToString() + "s.";
+        if (time <= 0)
+        {
+            timer.Stop();
+            timeText.color = Color.red;
+            timeText.fontStyle = FontStyle.Bold;
+            Die("Time out.");
+        }
+        #endregion
+    }
 
     int RandomNum()
     {
         byte[] randomBytes = new byte[4];
         RNGCryptoServiceProvider rngCrypto = new RNGCryptoServiceProvider();
         rngCrypto.GetBytes(randomBytes);
-        int rngNum = BitConverter.ToInt32(randomBytes, 0);//此为随机数
+        int rngNum = BitConverter.ToInt32(randomBytes, 0);
         return rngNum;
     }
 
-
-
     void NextLevel()
     {
+        Walls.SetActive(false);
         winText.gameObject.SetActive(false);
         noticeText.gameObject.SetActive(false);
         countText.gameObject.SetActive(true);
@@ -73,6 +115,27 @@ public class PlayerController : MonoBehaviour
         level++;
         countofbricks += (level * countofbricks);
         for (int t = 0; t < countofbricks; t++) Instantiate(PickUpPrefab, new Vector3(RandomNum() % 9, 0.5f, RandomNum() % 9), Quaternion.identity);
+        org_time *= level + 1;
+        time = org_time;
+        now_time = time;
+        timer.Start();
+    }
+
+    void ReTry()
+    {
+        fail = false;
+        win = false;
+        allwin = false;
+        timeText.color = Color.green;
+        winText.color = Color.yellow;
+        rb.MovePosition(new Vector3(0, 0, 0));
+        rb = GetComponent<Rigidbody>();
+        levelText.gameObject.SetActive(true);
+        noticeText.gameObject.SetActive(false);
+        winText.gameObject.SetActive(false);
+        time = now_time;
+        timer.Start();
+        org_time = countofbricks * 2;
     }
 
     void FixedUpdate()
@@ -95,9 +158,9 @@ public class PlayerController : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Pick Up"))
+        if (other.gameObject.CompareTag("Pick Up") && !fail)
         {
-            other.gameObject.SetActive(false);
+            Destroy(other.gameObject);
             count++;
             SetCountText();
         }
@@ -106,8 +169,10 @@ public class PlayerController : MonoBehaviour
     void SetCountText()
     {
         countText.text = "Collected: " + count.ToString() + " of " + countofbricks.ToString();
-        if (count >= countofbricks)
+        if (count >= countofbricks && !fail)
         {
+            timer.Stop();
+            Walls.SetActive(true);
             winText.gameObject.SetActive(true);
             winText.text = "You won level " + level.ToString() + "!";
             noticeText.text = "A great job.";
@@ -119,11 +184,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void CountDown(object source, System.Timers.ElapsedEventArgs e)
+    {
+        time--;
+    }
+
     void AllWin()
     {
         winText.gameObject.SetActive(true);
-        winText.text = ("You passed all the levels!");
+        winText.text = "You passed all the levels!";
         noticeText.text = "Congratulations!";
+        win = true;
+        allwin = true;
+    }
+
+    void Die(string reason)
+    {
+        fail = true;
+        winText.color = Color.red;
+        noticeText.color = Color.red;
+        levelText.gameObject.SetActive(false);
+        winText.gameObject.SetActive(true);
+        noticeText.gameObject.SetActive(true);
+        winText.text = "You died at level " + level.ToString() + ".";
+        noticeText.text = reason;
         win = true;
         allwin = true;
     }
